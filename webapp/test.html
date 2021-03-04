@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+<iframe id="ifr"
+        src="https://sogou.com"
+        style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"
+></iframe>
+
+
+</body>
+<script>
+    const url = "https://sogou.com";
+    let ifr = document.getElementById("ifr");
+    ifr.onload = function () {
+        fetch(url).then(
+            value => value.text()
+        ).then(response => {
+            ifr.contentWindow.postMessage({
+                http_url: url,
+                markdown_source: response,
+            }, ifr.src);
+        });
+    };
+
+</script>
+</html>

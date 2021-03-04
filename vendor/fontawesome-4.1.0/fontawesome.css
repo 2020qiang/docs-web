@@ -1,0 +1,50 @@
+/*
+ * content list
+ * https://fontawesome.com/v4.7.0/cheatsheet/
+ */
+
+.fontawesome-fa-align-justify:before {  content: "\f039"; }  /* 侧边栏伸缩 */
+.fontawesome-fa-home:before { content: "\f015"; }  /* 主页 */
+.fontawesome-fa-github:before { content: "\f09b"; }  /* github */
+.fontawesome-fa-envelope-o:before { content: "\f003"; }  /* gmail */
+
+.fontawesome {
+    height: 45px;
+    width: 50px;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    color: #CCCCCC;
+    font-size: 14px;
+    text-align: center; /* 水平居中 */
+    line-height: 44px; /* 垂直居中 */
+    float: left;
+    /*cursor: pointer;*/
+    text-decoration: none;
+}
+
+/* 竖屏css */
+@media screen and (orientation: portrait) {
+    .fontawesome {
+        height: calc(45px * 1.5);
+        width: calc(50px * 1.5);
+        line-height: calc(44px * 1.5);
+        font-size: 37px;
+    }
+}
+
+.fontawesome:hover {
+    /*color: #444444;*/
+}
+
+
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('/vendor/fontawesome-4.1.0/fontawesome-webfont.eot');
+    src: url('/vendor/fontawesome-4.1.0/fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+    url('/vendor/fontawesome-4.1.0/fontawesome-webfont.woff') format('woff'),
+    url('/vendor/fontawesome-4.1.0/fontawesome-webfont.ttf') format('truetype'),
+    url('/vendor/fontawesome-4.1.0/fontawesome-webfont.svg#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal
+}

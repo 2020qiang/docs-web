@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.nav {
+    /*padding: 20px;*/
+    width: 300px;
+    height: 100%;
+    background-color: #FAFAFA;
+    position: absolute;
+    left: 0;
+    user-select: none;
+}
+
+.line {
+    width: 2px;
+    height: 100%;
+    background-color: #BEBEBE;
+    position: absolute;
+    left: 300px;
+}
+
+.whiteboard {
+    width: calc(100% - (300px + 2px));
+    height: 100%;
+    background-color: #FFFFFF;
+    position: absolute;
+    left: calc(300px + 2px);
+    overflow: auto;
+}
+
+/* 竖屏css */
+@media screen and (orientation: portrait) {
+    body {
+        font-size: 30px;
+    }
+    .line {
+        left: 0;
+    }
+    .whiteboard {
+        left: 2px;
+        width: calc(100% - 2px);
+    }
+}
+
+.paper {
+    left: 0;
+    right: 0;
+    margin: auto;
+    /*width: 220mm;*/
+    height: calc(100vh - 63px);
+}

@@ -1,0 +1,9 @@
+{
+    "title": "阿强",
+    "auth": {
+        "user": "2020qiang",
+        "repo": "opdocs",
+        "branch": "master",
+        "root": "docs"
+    }
+}
