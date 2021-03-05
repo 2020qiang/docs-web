@@ -245,7 +245,7 @@ function update() {
     /*
      * 有选择性查看文档的话，一并显示大纲界面
      */
-    if (location.pathname === "/")
+    if (location.pathname + location.search === "/")
         return active_which(which_mode.file);
     active_which(which_mode.outline);
 }
