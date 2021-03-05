@@ -30,11 +30,16 @@ body {
     overflow: auto;
 }
 
-/* 竖屏css */
-@media screen and (orientation: portrait) {
-    body {
-        font-size: 30px;
-    }
+.paper {
+    left: 0;
+    right: 0;
+    margin: auto;
+    /*width: 220mm;*/
+    height: calc(100vh - 63px);
+}
+
+/* 窄屏=宽小于1000px */
+@media screen and (max-width: calc(1000px + 300px)) {
     .line {
         left: 0;
     }
@@ -42,12 +47,4 @@ body {
         left: 2px;
         width: calc(100% - 2px);
     }
-}
-
-.paper {
-    left: 0;
-    right: 0;
-    margin: auto;
-    /*width: 220mm;*/
-    height: calc(100vh - 63px);
 }

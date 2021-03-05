@@ -23,20 +23,6 @@
     text-decoration: none;
 }
 
-/* 竖屏css */
-@media screen and (orientation: portrait) {
-    .fontawesome {
-        height: calc(45px * 1.5);
-        width: calc(50px * 1.5);
-        line-height: calc(44px * 1.5);
-        font-size: 37px;
-    }
-}
-
-.fontawesome:hover {
-    /*color: #444444;*/
-}
-
 
 @font-face {
     font-family: 'FontAwesome';

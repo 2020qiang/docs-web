@@ -9,7 +9,7 @@ body {
     line-height: 1.6;
 
     margin: auto;
-    width: 220mm;
+    width: 210mm;
     padding: 0 0 50px 0;
 }
 
@@ -392,4 +392,17 @@ p > code {
     padding: 0 1px;
     font-family: "Lucida Console", Consolas, "Courier", monospace;
     color: #434343;
+}
+
+/* 屏幕容不下A4纸了 */
+@media screen and (max-width: 210mm) {
+    body {
+        font-size: 14px;
+        width: calc(100vw - 10px);
+        padding: 0 10px 0 10px;
+    }
+    img {
+        width: calc(100vw - 30px);
+        padding: 0 500px 0 500px;
+    }
 }
