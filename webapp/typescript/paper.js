@@ -51,12 +51,13 @@ function change_img_src(http_url) {
  */
 function click_a_alert() {
     return __awaiter(this, void 0, void 0, function* () {
-        let ele_a = document.body.getElementsByTagName("a");
-        for (let i = 0; i < ele_a.length; i++) {
-            ele_a[i].target = "_Blank";
-            ele_a[i].onmousedown = function () {
-                if (confirm("即将前往 " + ele_a[i].href)) {
-                    window.open(ele_a[i].href, "_blank");
+        let a = document.body.getElementsByTagName("a");
+        for (let i = 0; i < a.length; i++) {
+            a[i].dataset.href = a[i].href;
+            a[i].href = "#";
+            a[i].onmousedown = function () {
+                if (confirm("即将前往 " + a[i].dataset.href)) {
+                    window.open(a[i].dataset.href, "_blank");
                 }
             };
         }
