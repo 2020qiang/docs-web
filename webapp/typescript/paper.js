@@ -10,17 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import * as name from "../ts/library/name.js";
 window.onload = main;
 function main() {
-    const message = "paper: I am load success. Please send message to me.";
     window.parent.postMessage("read", location.href);
-    console.log(message);
     window.addEventListener('message', function (e) {
-        console.log("paper: I has read message data.");
         // @ts-ignore
         document.body.innerHTML = marked(e.data.markdown_source);
         change_img_src(e.data.http_url).then();
         click_a_alert().then();
         window.parent.postMessage("end", location.href);
-        console.log("paper: I am operation completed.");
     });
 }
 /*
