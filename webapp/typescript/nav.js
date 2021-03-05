@@ -98,7 +98,6 @@ function active_outline() {
             return returnData;
         }();
     }();
-    console.log(contents);
     for (let i = 0; i < contents.length; i++) {
         let space = "";
         for (let j = 0; j < contents[i].tag; j++) {

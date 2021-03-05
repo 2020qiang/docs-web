@@ -123,8 +123,6 @@ function active_outline(): void {
             return returnData;
         }();
     }();
-    console.log(contents);
-
     for (let i = 0; i < contents.length; i++) {
 
         let space = "";
