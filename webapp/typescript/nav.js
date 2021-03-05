@@ -113,11 +113,12 @@ function active_outline() {
             ifr.contentWindow.scrollTo(0, contents[i].position);
             /* 目的元素闪烁 */
             let ele = ifr.contentWindow.document.getElementById(contents[i].id);
-            const color_old = ele.style.color;
+            if (ele.dataset.color_old === undefined)
+                ele.dataset.color_old = ele.style.color;
             setTimeout(function () {
                 ele.style.color = "#2196f3";
                 setTimeout(function () {
-                    ele.style.color = color_old;
+                    ele.style.color = ele.dataset.color_old;
                 }, 300);
             }, 300);
         };
