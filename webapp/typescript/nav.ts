@@ -1,8 +1,6 @@
 import * as markdown from "./markdown.js";
 import * as name from "../ts/library/name.js";
 import * as browserUrl from "./browser_url.js"
-// import * as github from "../ts/method/github.js";
-// import * as paper from "../ts/start/paper.js";
 
 
 /* 文件界面 */
@@ -67,7 +65,7 @@ function active_file(ele: HTMLElement): void {
 }
 
 /* 大纲界面 */
-function active_outline(): void {
+function active_outline() {
 
     let ele = document.getElementById("nav-value");
     if (ele === null) return;
@@ -76,9 +74,10 @@ function active_outline(): void {
      * 所有h标签的内容
      */
     interface levelT {
-        tag: number,
+        level: number,
         text: string,
         id: string,
+        position: number
     }
 
     const contents = function (): levelT[] {
@@ -102,11 +101,11 @@ function active_outline(): void {
                 const text = ele_levels[i].innerHTML;
                 const id = ele_levels[i].id;
 
-
                 text_map.set(sha, {
-                    tag: tag,
+                    level: tag,
                     text: text,
                     id: id,
+                    position: sha,
                 });
                 text_sha.push(sha);
             }
@@ -125,8 +124,8 @@ function active_outline(): void {
     }();
     for (let i = 0; i < contents.length; i++) {
 
-        let space = "";
-        for (let j = 0; j < contents[i].tag; j++) {
+        let space = "&emsp;";
+        for (let j = 0; j < contents[i].level; j++) {
             space += "&emsp;";
         }
 
@@ -134,8 +133,19 @@ function active_outline(): void {
         ele_piece.className = "piece";
         ele_piece.innerHTML = space + contents[i].text;
         ele_piece.onmousedown = function () {
-            location.href = "#" + contents[i].id;
-            history.pushState('', '', location.href.split("#", 1)[0]);
+            /* 滚动到 */
+            let ifr = document.getElementById("markdown");
+            if (ifr === null) return;
+            ifr.contentWindow.scrollTo(0, contents[i].position);
+            /* 目的元素闪烁 */
+            let ele = ifr.contentWindow.document.getElementById(contents[i].id);
+            const color_old = ele.style.color;
+            setTimeout(function () {
+                ele.style.color = "#2196f3";
+                setTimeout(function () {
+                    ele.style.color = color_old;
+                }, 300);
+            }, 300);
         };
         ele.appendChild(ele_piece);
     }
