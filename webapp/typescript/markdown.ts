@@ -1,47 +1,62 @@
 import * as config from "./config.js";
-import * as http_get_sync from "./http_get_sync.js";
+import * as server from "./server.js";
 import * as browserUrl from "./browser_url.js"
 import * as name from "../ts/library/name.js";
 
-const auth: any = config.json().auth;
+interface filesI {
+    (array: string[]): void
+}
 
-function files(): string[] {
-    /* 获取tree的sha */
-    const sha_root: string = function (): string {
-        const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents?ref=" + auth.branch;
-        const resp = http_get_sync.GET(url);
-        const data = JSON.parse(resp);
-        for (let i = 0; i < data.length; i++) {
-            if (data[i].path === auth.root) {
-                return data[i].sha;
+function files(files_callback: filesI): void {
+    config.json(conf => {
+        const auth = conf.auth;
+
+        /* 获取tree的sha */
+        function sha_root(callback: Function): void {
+            const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents?ref=" + auth.branch;
+            server.GET(url, resp => {
+                const data = JSON.parse(resp);
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].path === auth.root) {
+                        return callback(data[i].sha);
+                    }
+                }
+            });
+        }
+
+        /* 使用sha获取 所有子文件 */
+        function file_s(callback: Function): void {
+            sha_root((sha: string) => {
+                if (sha === "") return callback([]);
+
+                let v: string[] = [];
+                const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/git/trees/" + sha + "?recursive=1";
+                server.GET(url, resp => {
+                    const data = JSON.parse(resp);
+                    for (let i = 0; i < data.tree.length; i++) {
+                        if (data.tree[i].type === "blob") {
+                            v.push(data.tree[i].path);
+                        }
+                    }
+                    callback(v);
+                });
+            });
+        }
+
+        /* 提取.md结尾的文件*/
+        file_s((fs: string[]) => {
+            if (fs.length === 0) return files_callback([]);
+            /* 提取markdown后缀名路径 */
+            let markdown_s: string[] = [];
+            for (let i = 0; i < fs.length; i++) {
+                if (/\.md$/.test(fs[i])) {
+                    markdown_s.push(fs[i]);
+                }
             }
-        }
-        return "";
-    }();
-    if (sha_root === "") return [];
-    /* 使用sha获取 所有子文件 */
-    const file_s: string[] = function (): string[] {
-        let v: string[] = [];
-        const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/git/trees/" + sha_root + "?recursive=1";
-        const resp = http_get_sync.GET(url);
-        const data = JSON.parse(resp);
-        for (let i = 0; i < data.tree.length; i++) {
-            if (data.tree[i].type === "blob") {
-                v.push(data.tree[i].path);
-            }
-        }
-        return v;
-    }()
-    if (file_s.length === 0) return [];
-    /* 提取markdown后缀名路径 */
-    let markdown_s: string[] = [];
-    for (let i = 0; i < file_s.length; i++) {
-        if (/\.md$/.test(file_s[i])) {
-            markdown_s.push(file_s[i]);
-        }
-    }
-    /* 持久化储存字符串 */
-    return markdown_s.sort();
+            /* 持久化储存字符串 */
+            files_callback(markdown_s.sort());
+        });
+    });
 }
 
 interface indexT {
@@ -51,61 +66,79 @@ interface indexT {
     hide: boolean
 }
 
-function index(): indexT[] {
+interface indexI {
+    (array: indexT[]): void
+}
+
+function index(callback: indexI): void {
     // 例如 https://raw.githubusercontent.com/<username>/opdocs/master/docs/index.json
-    const url = "https://raw.githubusercontent.com/" +
-        auth.user + "/" + auth.repo + "/" + auth.branch + "/" + auth.root + "/index.json";
-    const text = http_get_sync.GET(url);
-    const data = JSON.parse(text);
-    let returnData: indexT[] = [];
-    for (const k in data) {
-        if (!data.hasOwnProperty(k)) continue;
-        returnData.push({
-            route: k,
-            title: data[k].title,
-            path: data[k].path,
-            hide: data[k].hide === true,
-        })
-    }
-    return returnData;
+    config.json(conf => {
+        const auth = conf.auth;
+        const url = "https://raw.githubusercontent.com/" + auth.user + "/" + auth.repo + "/" + auth.branch + "/" + auth.root + "/index.json";
+        server.GET(url, resp => {
+            const data = JSON.parse(resp);
+            let returnData: indexT[] = [];
+            for (const k in data) {
+                if (!data.hasOwnProperty(k)) continue;
+                returnData.push({
+                    route: k,
+                    title: data[k].title,
+                    path: data[k].path,
+                    hide: data[k].hide === true,
+                })
+            }
+            callback(returnData);
+        });
+    });
 }
 
 /*
  * 从url获取当前应该展示哪个markdown文件，并返回下载url
  */
-function url_get_which_file_download_url(): string {
-    const info = browserUrl.info();
-    switch (info.type) {
-        /*
-         * 首页
-         */
-        case browserUrl.type.index: {
-            const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents?ref=" + auth.branch;
-            const resp = http_get_sync.GET(url);
-            const data = JSON.parse(resp);
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].path === "README.md") return data[i].download_url;
-            }
-            return "";
-        }
-        /*
-         * 静态页 和 动态页
-         */
-        case browserUrl.type.static:
-        case browserUrl.type.float: {
-            const father_dir = name.dir(info.route);
-            const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents/" + auth.root + "/" + father_dir + "?ref=" + auth.branch + "&recursive=1";
-            const resp = http_get_sync.GET(url);
-            const data = JSON.parse(resp);
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].path === auth.root + "/" + info.route) {
-                    return data[i].download_url;
+
+interface urlI {
+    (url: string): void
+}
+
+function url_get_which_file_download_url(callback: urlI): void {
+    config.json(conf => {
+        browserUrl.info(info => {
+            const auth = conf.auth;
+            switch (info.type) {
+                /*
+                 * 首页
+                 */
+                case browserUrl.type.index: {
+                    const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents?ref=" + auth.branch;
+                    server.GET(url, resp => {
+                        const data = JSON.parse(resp);
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].path === "README.md") return callback(data[i].download_url);
+                        }
+                    });
+                    return;
+                }
+                /*
+                 * 静态页 和 动态页
+                 */
+                case browserUrl.type.static:
+                case browserUrl.type.float: {
+                    const father_dir = name.dir(info.route);
+                    const url = "https://api.github.com/repos/" + auth.user + "/" + auth.repo + "/contents/" + auth.root + "/" + father_dir + "?ref=" + auth.branch + "&recursive=1";
+                    server.GET(url, resp => {
+                        const data = JSON.parse(resp);
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].path === auth.root + "/" + info.route) {
+                                return callback(data[i].download_url);
+                            }
+                        }
+                    });
+                    return;
                 }
             }
-            return "";
-        }
-    }
-    return "";
+            return;
+        });
+    });
 }
 
 export {

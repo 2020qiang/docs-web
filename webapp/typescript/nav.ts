@@ -39,29 +39,31 @@ function active_file(ele: HTMLElement): void {
     /*
      * 静态的文档链接
      */
-    const github_index = markdown.index();
-    let add_line: boolean = false;
-    for (let i = 0; i < github_index.length; i++) {
-        if (github_index[i].hide) continue;
-        add.link({title: github_index[i].title, href: github_index[i].route})
-        add_line = true;
-    }
-    if (add_line) add.line();
-
-    /*
-     * 动态的文档链接
-     */
-    let github_list = markdown.files();
-    for (let i = 0; i < github_index.length; i++) {
-        for (let j = 0; j < github_list.length; j++) {
-            if (github_list[j] === github_index[i].path) {
-                github_list.splice(j, 1);
-            }
+    markdown.index(github_index => {
+        let add_line: boolean = false;
+        for (let i = 0; i < github_index.length; i++) {
+            if (github_index[i].hide) continue;
+            add.link({title: github_index[i].title, href: github_index[i].route})
+            add_line = true;
         }
-    }
-    for (let i = 0; i < github_list.length; i++) {
-        add.link({title: name.name(github_list[i]), href: browserUrl.float_split + github_list[i]});
-    }
+        if (add_line) add.line();
+
+        /*
+         * 动态的文档链接
+         */
+        markdown.files(github_list => {
+            for (let i = 0; i < github_index.length; i++) {
+                for (let j = 0; j < github_list.length; j++) {
+                    if (github_list[j] === github_index[i].path) {
+                        github_list.splice(j, 1);
+                    }
+                }
+                for (let i = 0; i < github_list.length; i++) {
+                    add.link({title: name.name(github_list[i]), href: browserUrl.float_split + github_list[i]});
+                }
+            }
+        });
+    });
 }
 
 /* 大纲界面 */

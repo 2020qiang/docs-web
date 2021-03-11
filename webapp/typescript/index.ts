@@ -1,5 +1,5 @@
 import * as markdown from "./markdown.js"
-import * as http_get_sync from "./http_get_sync.js"
+import * as server from "./server.js"
 import * as title from "./title.js"
 import * as nav from "./nav.js"
 
@@ -29,19 +29,22 @@ function main(): void {
 
 
 function write() {
-    const download_url = markdown.url_get_which_file_download_url();
-    let text: string;
-    if (download_url === "") {
-        text = "## 未找到文件"
-    } else {
-        text = http_get_sync.GET(download_url);
-        text = text.replace(/\n\n\n\n/g, `\n\n<br class="null">\n\n`);
+    function Callback(callback: Function): void {
+        markdown.url_get_which_file_download_url(url => {
+            if (url === "") return callback("", "## 未找到文件");
+            server.GET(url, (resp: string) => {
+                resp = resp.replace(/\n\n\n\n/g, `\n\n<br class="null">\n\n`);
+                callback(url, resp);
+            });
+        });
     }
 
-    let ifr = document.getElementById("markdown");
-    const data = {http_url: download_url, markdown_source: text};
-    // @ts-ignore
-    ifr.contentWindow.postMessage(data, ifr.src);
+    Callback(function (download_url: string, text: string): void {
+        let ifr = document.getElementById("markdown");
+        const data = {http_url: download_url, markdown_source: text};
+        // @ts-ignore
+        ifr.contentWindow.postMessage(data, ifr.src);
+    });
 }
 
 function opt() {

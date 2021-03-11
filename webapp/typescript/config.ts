@@ -1,4 +1,4 @@
-import * as http_get_sync from "./http_get_sync.js"
+import * as server from "./server.js"
 
 interface configT {
     title: string,
@@ -10,19 +10,21 @@ interface configT {
     },
 }
 
+interface configI {
+    (conf: configT): void
+}
 
-function json(): configT {
-    try {
-        const text = http_get_sync.GET("/webapp/config.json");
-        return JSON.parse(text);
-    } catch {
-        document.title = "error";
-        document.body.innerText = "Error: fetch /webapp/config.json from remote fail";
-        return {
-            title: "",
-            auth: {user: "", repo: "", branch: "", root: ""},
+function json(callback: configI): void {
+    server.GET("/webapp/config.json", (resp: string) => {
+        try {
+            callback(JSON.parse(resp));
+        } catch {
+            callback({
+                title: "",
+                auth: {user: "", repo: "", branch: "", root: ""},
+            });
         }
-    }
+    });
 }
 
 export {
