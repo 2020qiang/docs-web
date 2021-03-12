@@ -106,11 +106,14 @@ function url_get_which_file_download_url(callback) {
                                 return callback(data[i].download_url);
                             }
                         }
+                        return callback("");
                     });
-                    return;
+                    break;
+                }
+                default: {
+                    return callback("");
                 }
             }
-            return;
         });
     });
 }
