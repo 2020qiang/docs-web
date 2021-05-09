@@ -54,7 +54,7 @@ function click_a_alert() {
         let a = document.body.getElementsByTagName("a");
         for (let i = 0; i < a.length; i++) {
             a[i].dataset.href = a[i].href;
-            a[i].href = "#";
+            a[i].href = "javascript:void(0);";
             a[i].onmousedown = function () {
                 if (confirm("即将前往 " + a[i].dataset.href)) {
                     window.open(a[i].dataset.href, "_blank");
